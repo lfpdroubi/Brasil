@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
+    <title>Cadastro Marinho para a América Latina</title>
+    
+    <!-- Add css -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin=""/>
+    <link rel="stylesheet" href="./node_modules/leaflet-search/dist/leaflet-search.src.css" />
+    <link rel="stylesheet" href="./Leaflet.MousePosition/src/L.Control.MousePosition.css" />
+    <link rel="stylesheet" href="bower_components/leaflet-groupedlayercontrol/src/leaflet.groupedlayercontrol.css" />
+    <link rel="stylesheet" href="./leaflet-mapkey-icon/dist/MapkeyIcons.css" />
+    <link rel="stylesheet" href="./leaflet.fullscreen/Control.FullScreen.css" />
+    <link rel="stylesheet" href="./node_modules/leaflet-minimap/dist/Control.MiniMap.min.css" />
+    <link rel="stylesheet" href="./node_modules/leaflet-basemaps/L.Control.Basemaps.css" />
+    <link rel="stylesheet" href="./leaflet-betterscale/L.Control.BetterScale.css" />
+
+    <!-- Add jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <!-- Add Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+      integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+      crossorigin=""></script>
+    <!-- Add Leaflet Plugins -->
+    <script src="./node_modules/leaflet-search/dist/leaflet-search.src.js"></script>
+    <script src="./Leaflet.MousePosition/src/L.Control.MousePosition.js"></script>
+    <script src="bower_components/leaflet-groupedlayercontrol/src/leaflet.groupedlayercontrol.js"></script>
+    <script src="./leaflet-mapkey-icon/dist/L.Icon.Mapkey.js"></script>
+    <script src='./node_modules/leaflet-easyprint/dist/bundle.js'></script>
+    <script src="./leaflet.fullscreen/Control.FullScreen.js"></script>
+    <script src="./node_modules/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
+    <script src="./node_modules/leaflet-basemaps/L.Control.Basemaps.js"></script>
+    <script src="./leaflet-betterscale/L.Control.BetterScale.js"></script>
+    <script src="https://leaflet.github.io/Leaflet.Graticule/Leaflet.Graticule.js"></script>
+    <script src="./node_modules/proj4/dist/proj4.js"></script>
+    <script src="./node_modules/proj4leaflet/src/proj4leaflet.js"></script>
+    <script src="./node_modules/leaflet-textpath/leaflet.textpath.js"></script>
+
+    <style type="text/css">
+     #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+     }
+    </style>
+
+  </head>
+
+<body>
+    <div id="map"></div>
+    <!-- MAP SCRIPT -->
+    <script>
+    
+      // Add AJAX requests for data
+      var latinamerica = $.ajax({
+        url:"https://raw.githubusercontent.com/lfpdroubi/SPUData/master/LatinAmerica.geojson",
+        dataType: "json",
+        success: console.log("Latin America boundaries data successfully loaded."),
+        error: function (xhr) {
+          alert(xhr.statusText)
+        }
+      })
+      
+      var eez = $.ajax({
+        url:"https://raw.githubusercontent.com/lfpdroubi/LatinAmericaData/master/EEZ.geojson",
+        dataType: "json",
+        success: console.log("Latin America EEZ data successfully loaded."),
+        error: function (xhr) {
+          alert(xhr.statusText)
+        }
+      })      
+      
+      /* when().done() SECTION*/
+      // Add the variable for each of your AJAX requests to $.when()
+      $.when(latinamerica, eez).done(function() {
+      
+        // Initializes the map
+        var map = L.map('map', {
+            center: [-14.77488, -54.31641],
+            zoom: 4,
+            preferCanvas: false,
+            fullscreenControl: true,
+            fullscreenControlOptions: {
+              position: 'topleft'
+            }
+        });
+        
+        // Adds Esri Base Maps
+        var WSM = L.tileLayer(
+          'http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}.png', {
+  			    maxZoom: 18,
+  			    label: "World Street Map",
+  			    attribution: 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+          });
+          
+        var Esri_WorldImagery = L.tileLayer(
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxNativeZoom: 19,
+            maxZoom: 100,
+            label: "Esri World Imagery",
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+        });
+              
+        var Esri_OceanBasemap = L.tileLayer(
+          'https://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}', {
+             maxZoom: 13,
+             label: "Esri Ocean Basemap",
+  	         attribution: 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri'
+  	    });
+          
+        // Adds Open Street Base Maps
+        var OpenStreetMap_Mapnik = L.tileLayer(
+          'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            label: "OpenStreetMap",
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+  
+        var OpenTopoMap = L.tileLayer(
+          'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            maxZoom: 17,
+            label: "OpenTopoMap",
+            attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+        });
+  
+        // Adds WMS Layer (SIG-SC)
+        var wmsLayer = L.tileLayer.wms(
+          'http://sigsc.sc.gov.br/sigserver/SIGSC/wms', {
+            maxNativeZoom: 19,
+            maxZoom: 100,
+            layers: 'OrtoRGB-Landsat-2012',
+            label: "SIG/SC",
+            iconURL: 'sig-sc.png'
+        });
+        
+        // Adds Data
+        
+        // Adds SIRGAS2000 GeoJSON
+        var LatinAmerica = L.geoJSON(latinamerica.responseJSON, {
+          style: function(feature) {
+            return{
+              fillOpacity: .25,
+              color: feature.COLORMAP,
+              weight: 0.75
+            }
+          },
+          onEachFeature: function( feature, layer ){
+            layer.bindPopup(
+              "<b>Nome: </b>" + feature.properties.LOCLNGNAM + "<br>" +
+              "<b>Status: </b>" + feature.properties.STATUS + "<br>" +
+              "<b>Área: </b>" + feature.properties.SQKM.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " km &#178; <br>" +
+              "<b>População (2019): </b>" + feature.properties.POP_CNTRY.toLocaleString('de-DE', { maximumFractionDigits: 0 })
+              );
+            layer.bindTooltip(feature.properties.LOCSHRTNAM,{
+              permanent: false
+            });
+          }
+        }).addTo(map);
+        
+        function link(feature){
+          return "<a href= http://www.marineregions.org/gazetteer.php?p=details&id=" + feature.properties.mrgid + " target='_blank'>Link.</a>"; 
+        }
+        
+        var EEZ = L.geoJSON(eez.responseJSON, {
+        style: {
+          color: '#133863',
+          weight: 2,
+          fillOpacity: .25
+        },
+        onEachFeature: function( feature, layer ){
+                       layer.bindPopup(
+                         "<b>Descrição: </b>" + feature.properties.geoname + "<br>" +
+                         "<b>Fonte: </b>" + link(feature) + "<br>" +
+                         "<b>Área (km &#178; ): " + feature.properties.area_km2.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + "<br>" +
+                         "<b>Obs.: </b>" + "Não contempla a extensão da plataforma continental."
+                         );
+          }
+        }
+        ).addTo(map);
+        
+        var basemaps = [
+                Esri_OceanBasemap, Esri_WorldImagery, OpenStreetMap_Mapnik , 
+                OpenTopoMap, wmsLayer
+                ]
+              
+        map.addControl(L.control.basemaps({
+          basemaps: basemaps,
+          tileX: 0,  // tile X coordinate
+          tileY: 0,  // tile Y coordinate
+          tileZ: 1   // tile zoom level
+          })
+        );
+        
+        L.control.mousePosition({
+          position: 'bottomleft'
+        }).addTo(map);
+
+      });
+    </script>
+</body>
+</html>
