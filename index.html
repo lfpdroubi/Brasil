@@ -77,18 +77,47 @@
         }
       })      
       
+      var arg_ury = $.ajax({
+        url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/URY-ARG_TREATY.geojson",
+        dataType: "json",
+        success: console.log("ARG-URY Treaty data successfully loaded."),
+        error: function (xhr) {
+          alert(xhr.statusText)
+        }
+      })
+      
+      var falklands = $.ajax({
+        url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/malvinas.geojson",
+        dataType: "json",
+        success: console.log("Falklands data successfully loaded."),
+        error: function (xhr) {
+          alert(xhr.statusText)
+        }
+      })       
+      
+      var extensao = $.ajax({
+        url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/extensao_PC/BRA_extensao_pc.geojson",
+        dataType: "json",
+        success: console.log("CP Extension data successfully loaded."),
+        error: function (xhr) {
+          alert(xhr.statusText)
+        }
+      })
+      
       /* when().done() SECTION*/
       // Add the variable for each of your AJAX requests to $.when()
-      $.when(latinamerica, eez).done(function() {
+      $.when(latinamerica, eez, arg_ury, falklands, extensao).done(function() {
       
         // Initializes the map
         var map = L.map('map', {
             center: [-14.77488, -54.31641],
+            attributionControl: false,
+            zoomControl: false,
             zoom: 4,
             preferCanvas: false,
             fullscreenControl: true,
             fullscreenControlOptions: {
-              position: 'topleft'
+              position: 'topright'
             }
         });
         
@@ -114,6 +143,13 @@
              label: "Esri Ocean Basemap",
   	         attribution: 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri'
   	    });
+  	    
+        var Esri_NatGeoWorldMap = L.tileLayer(
+          'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 16,
+            label: 'Esri NatGeo World Map',
+            attribution: 'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
+	          });
           
         // Adds Open Street Base Maps
         var OpenStreetMap_Mapnik = L.tileLayer(
@@ -147,7 +183,7 @@
           style: function(feature) {
             return{
               fillOpacity: .25,
-              color: feature.COLORMAP,
+              color: '#f1f4c7',
               weight: 0.75
             }
           },
@@ -185,22 +221,126 @@
         }
         ).addTo(map);
         
-        var basemaps = [
-                Esri_OceanBasemap, Esri_WorldImagery, OpenStreetMap_Mapnik , 
-                OpenTopoMap, wmsLayer
-                ]
-              
-        map.addControl(L.control.basemaps({
-          basemaps: basemaps,
-          tileX: 0,  // tile X coordinate
-          tileY: 0,  // tile Y coordinate
-          tileZ: 1   // tile zoom level
-          })
-        );
+        var ARG_URY = L.geoJSON(arg_ury.responseJSON, {
+          style: {
+            color: 'Red',
+            weight: 2,
+            fillOpacity: .25
+          },
+          onEachFeature: function( feature, layer ){
+                         layer.bindPopup(
+                           "<b>Descrição: </b>" + "Treaty between Uruguay and Argentina concerning the Rio de la Plata and the Corresponding Mariti Boundary " + "<br>" +
+                           "<b>Fonte: </b>" + "<a href= http://www.marineregions.org/gazetteer.php?p=details&id=48961  target='_blank'>Link.</a>"+ "<br>" +
+                           "<b>Área (km &#178; ): " + feature.properties.area_km2.toLocaleString('de-DE', { maximumFractionDigits: 2 })
+                           );
+            }
+          }
+        ).addTo(map)
         
-        L.control.mousePosition({
-          position: 'bottomleft'
-        }).addTo(map);
+        var FALKLANDS = L.geoJSON(falklands.responseJSON, {
+            style: {
+              color: '#f1f4c7',
+              weight: 2,
+              fillOpacity: .25
+            },
+            onEachFeature: function( feature, layer ){
+                           layer.bindPopup(
+                             "<b>Descrição: </b>" + "Malvinas" + "<br>" +
+                             "<b>Fonte: </b>" + "<a href= http://www.marineregions.org/gazetteer.php?p=details&id=47625 target='_blank'>Link.</a>" + "<br>" +
+                             "<b>Área (km &#178; ): " + "<br>" +
+                             "<b>Obs.: </b>"
+                           );
+            }
+          }
+        ).addTo(map);
+        
+      var EXTENSAO = L.geoJSON(extensao.responseJSON, {
+        style: {
+          color: 'LightGray',
+          weight: 2,
+          fillOpacity: .25
+        },
+        onEachFeature: function( feature, layer ){
+                       layer.bindPopup(
+                         "<b>Nome: </b>" + feature.properties.nome + "<br>" +
+                         "<b>Região: </b>" +  feature.properties.regiao + "<br>" +
+                         "<b>Área (km &#178; ): "
+                         );
+          }
+        }
+      ).addTo(map);
+      
+      // Add Minimap
+      var miniMap = new L.Control.MiniMap(OpenStreetMap_Mapnik, {
+          position: 'topright',
+          toggleDisplay: true
+        }
+      ).addTo(map);
+        
+      var basemaps = [
+              Esri_OceanBasemap, Esri_NatGeoWorldMap, Esri_WorldImagery, OpenStreetMap_Mapnik , 
+              OpenTopoMap, wmsLayer
+              ]
+            
+      map.addControl(L.control.basemaps({
+        basemaps: basemaps,
+        tileX: 0,  // tile X coordinate
+        tileY: 0,  // tile Y coordinate
+        tileZ: 1   // tile zoom level
+        })
+      );
+        
+      var groupedOverlays = {
+        "Limites territoriais":{
+          "América Latina": LatinAmerica,
+          //"Águas Internas": IW,
+          //"Mar Territorial (12MN)": TS,
+          //"Zona Contígua (24MN)": CZ,
+          "Zona Econômica Exclusiva (200MN)": EEZ,
+          "Extensão da PC": EXTENSAO
+        },
+        //"Ambiental": {
+        //  "Unidades de Conservação": UC
+        //},
+      };
+      
+      L.control.groupedLayers(null, groupedOverlays, {
+        position: 'topleft'
+      }).addTo(map);
+          
+      L.control.mousePosition({
+        position: 'bottomleft'
+      }).addTo(map);
+      
+      L.control.betterscale({
+        metric:  true,
+        imperial: false,
+        position: 'bottomleft'
+      }).addTo(map);
+      
+      L.easyPrint({
+        tileLayer: OpenStreetMap_Mapnik,
+        title: 'Screenshot',
+        position: 'topleft',
+        sizeModes: ['Current', 'A4Landscape', 'A4Portrait'],
+        exportOnly: true,
+        hideControlContainer: false,
+        hideClasses: ['leaflet-control-mouseposition', 'leaflet-control-layers',
+        'leaflet-control-easyPrint', 'leaflet-control-zoom-fullscreen', 
+        'basemaps']
+      }).addTo(map);
+      
+      L.latlngGraticule({
+			   showLabel: true,
+			   color: '#222',
+			   zoomInterval: [
+			     {start: 2, end: 3, interval: 30},
+			     {start: 4, end: 4, interval: 10},
+			     {start: 5, end: 7, interval: 5},
+			     {start: 8, end: 10, interval: 1},
+			     {start: 11, end:15, interval:.2}
+			   ]
+		  }).addTo(map);        
 
       });
     </script>
