@@ -60,7 +60,7 @@
     
       // Add AJAX requests for data
       var latinamerica = $.ajax({
-        url:"https://raw.githubusercontent.com/lfpdroubi/SPUData/master/LatinAmerica.geojson",
+        url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/LatinAmerica.geojson",
         dataType: "json",
         success: console.log("Latin America boundaries data successfully loaded."),
         error: function (xhr) {
@@ -69,7 +69,7 @@
       })
       
       var eez = $.ajax({
-        url:"https://raw.githubusercontent.com/lfpdroubi/LatinAmericaData/master/EEZ.geojson",
+        url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/EEZ.geojson",
         dataType: "json",
         success: console.log("Latin America EEZ data successfully loaded."),
         error: function (xhr) {
