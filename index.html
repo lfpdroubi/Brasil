@@ -77,15 +77,6 @@
         }
       })      
       
-      var arg_ury = $.ajax({
-        url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/URY-ARG_TREATY.geojson",
-        dataType: "json",
-        success: console.log("ARG-URY Treaty data successfully loaded."),
-        error: function (xhr) {
-          alert(xhr.statusText)
-        }
-      })
-      
       var falklands = $.ajax({
         url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/malvinas.geojson",
         dataType: "json",
@@ -106,7 +97,7 @@
       
       /* when().done() SECTION*/
       // Add the variable for each of your AJAX requests to $.when()
-      $.when(latinamerica, eez, arg_ury, falklands, extensao).done(function() {
+      $.when(latinamerica, eez, falklands, extensao).done(function() {
       
         // Initializes the map
         var map = L.map('map', {
@@ -237,22 +228,6 @@
           }
         }
         ).addTo(map);
-        
-        var ARG_URY = L.geoJSON(arg_ury.responseJSON, {
-          style: {
-            color: 'Red',
-            weight: 2,
-            fillOpacity: .25
-          },
-          onEachFeature: function( feature, layer ){
-                         layer.bindPopup(
-                           "<b>Descrição: </b>" + "Treaty between Uruguay and Argentina concerning the Rio de la Plata and the Corresponding Mariti Boundary " + "<br>" +
-                           "<b>Fonte: </b>" + "<a href= http://www.marineregions.org/gazetteer.php?p=details&id=48961  target='_blank'>Link.</a>"+ "<br>" +
-                           "<b>Área (km &#178; ): " + feature.properties.area_km2.toLocaleString('de-DE', { maximumFractionDigits: 2 })
-                           );
-            }
-          }
-        ).addTo(map)
         
         var FALKLANDS = L.geoJSON(falklands.responseJSON, {
             style: {
