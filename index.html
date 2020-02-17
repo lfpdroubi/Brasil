@@ -165,7 +165,7 @@
         }).addTo(map);
         
         function link(feature){
-          return "<a href= http://www.marineregions.org/gazetteer.php?p=details&id=" + feature.properties.mrgid + " target='_blank'>Link.</a>"; 
+          return "<a href= http://www.marineregions.org/gazetteer.php?p=details&id=" + feature.properties.MRGID + " target='_blank'>Link.</a>"; 
         }
         
         var EEZ = L.geoJSON(eez.responseJSON, {
@@ -176,10 +176,9 @@
         },
         onEachFeature: function( feature, layer ){
                        layer.bindPopup(
-                         "<b>Descrição: </b>" + feature.properties.geoname + "<br>" +
+                         "<b>Descrição: </b>" + feature.properties.GEONAME + "<br>" +
                          "<b>Fonte: </b>" + link(feature) + "<br>" +
-                         "<b>Área (km &#178; ): " + feature.properties.area_km2.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + "<br>" +
-                         "<b>Obs.: </b>" + "Não contempla a extensão da plataforma continental."
+                         "<b>Área (km &#178; ): " + feature.properties.AREA_KM2.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + "<br>" 
                          );
           }
         }
