@@ -204,15 +204,32 @@
           return "<a href= http://www.marineregions.org/gazetteer.php?p=details&id=" + feature.properties.MRGID + " target='_blank'>Link.</a>"; 
         }
         
+        function getAreaColor(feature){
+          console.log(feature)
+          	switch (feature.properties.POL_TYPE){
+            	case '200NM' : return '#133863';
+              case 'Overlapping claim' : return 'Red';
+              	break;
+            }
+        };
+        
+        function areaStyle(feature){
+        	return {
+          	fillColor: getAreaColor(feature),
+            weight: 2,
+            opacity: 1,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.25
+          }
+        };
+        
         var EEZ = L.geoJSON(eez.responseJSON, {
-        style: {
-          color: '#133863',
-          weight: 2,
-          fillOpacity: .25
-        },
+        style: areaStyle,
         onEachFeature: function( feature, layer ){
                        layer.bindPopup(
                          "<b>Descrição: </b>" + feature.properties.GEONAME + "<br>" +
+                         "<b>Tipo: </b>" + feature.properties.POL_TYPE + "<br>" +
                          "<b>Fonte: </b>" + link(feature) + "<br>" +
                          "<b>Área (km &#178; ): " + feature.properties.AREA_KM2.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + "<br>" 
                          );
