@@ -184,9 +184,16 @@
             opacity: .40
         });
         
+        // Adds Bathymetry data
+        var GEBCO = L.tileLayer.wms(
+          'https://www.gebco.net/data_and_products/gebco_web_services/2019/mapserv?', {
+            layers: 'GEBCO_2019_Grid'
+          }
+          
+        );
+        
         // Adds GeoJson Data
         
-        // Adds SIRGAS2000 GeoJSON
         var LatinAmerica = L.geoJSON(latinamerica.responseJSON, {
           style: function(feature) {
             return{
@@ -350,6 +357,9 @@
           "Ecoregions": Ecoregions,
           "Large Marine Ecosystems": LME,
           "FAO": FAO
+        },
+        "Batimetria": {
+          "GEBCO (2019)": GEBCO
         }
         //"Ambiental": {
         //  "Unidades de Conservação": UC
