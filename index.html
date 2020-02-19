@@ -68,15 +68,6 @@
         }
       })
       
-      var eez = $.ajax({
-        url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/EEZ.geojson",
-        dataType: "json",
-        success: console.log("Latin America EEZ data successfully loaded."),
-        error: function (xhr) {
-          alert(xhr.statusText)
-        }
-      })      
-      
       var falklands = $.ajax({
         url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/malvinas.geojson",
         dataType: "json",
@@ -84,7 +75,16 @@
         error: function (xhr) {
           alert(xhr.statusText)
         }
-      })       
+      }) 
+      
+      var eez = $.ajax({
+        url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/EEZ.geojson",
+        dataType: "json",
+        success: console.log("Latin America EEZ data successfully loaded."),
+        error: function (xhr) {
+          alert(xhr.statusText)
+        }
+      })  
       
       var extensao = $.ajax({
         url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/extensao_PC/BRA_extensao_pc.geojson",
@@ -95,9 +95,28 @@
         }
       })
       
+      var lme = $.ajax({
+        url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/LME66.geojson",
+        dataType: "json",
+        success: console.log("LME data successfully loaded."),
+        error: function (xhr) {
+          alert(xhr.statusText)
+        }
+      })     
+      
+      var fao = $.ajax({
+        url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/FAO_Area.geojson",
+        dataType: "json",
+        success: console.log("FAO data successfully loaded."),
+        error: function (xhr) {
+          alert(xhr.statusText)
+        }
+      })
+
+      
       /* when().done() SECTION*/
       // Add the variable for each of your AJAX requests to $.when()
-      $.when(latinamerica, eez, falklands, extensao).done(function() {
+      $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
       
         // Initializes the map
         var map = L.map('map', {
@@ -157,17 +176,15 @@
             attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
         });
   
-        // Adds WMS Layer (SIG-SC)
-        var wmsLayer = L.tileLayer.wms(
-          'http://sigsc.sc.gov.br/sigserver/SIGSC/wms', {
-            maxNativeZoom: 19,
-            maxZoom: 100,
-            layers: 'OrtoRGB-Landsat-2012',
-            label: "SIG/SC",
-            iconURL: 'sig-sc.png'
+        // Adds WMS Layer (Marine Regions)
+        var Ecoregions = L.tileLayer.wms(
+          'http://geo.vliz.be/geoserver/Ecoregions/wms', {
+            layers: 'ecoregions',
+            transparency: true,
+            opacity: .40
         });
         
-        // Adds Data
+        // Adds GeoJson Data
         
         // Adds SIRGAS2000 GeoJSON
         var LatinAmerica = L.geoJSON(latinamerica.responseJSON, {
@@ -190,6 +207,23 @@
             });
           }
         }).addTo(map);
+        
+        var FALKLANDS = L.geoJSON(falklands.responseJSON, {
+            style: {
+              color: '#f1f4c7',
+              weight: 2,
+              fillOpacity: .25
+            },
+            onEachFeature: function( feature, layer ){
+                           layer.bindPopup(
+                             "<b>Descrição: </b>" + "Malvinas" + "<br>" +
+                             "<b>Fonte: </b>" + "<a href= http://www.marineregions.org/gazetteer.php?p=details&id=47625 target='_blank'>Link.</a>" + "<br>" +
+                             "<b>Área (km &#178; ): " + "<br>" +
+                             "<b>Obs.: </b>"
+                           );
+            }
+          }
+        ).addTo(map);
         
         function link(feature){
           return "<a href= http://www.marineregions.org/gazetteer.php?p=details&id=" + feature.properties.MRGID + " target='_blank'>Link.</a>"; 
@@ -217,8 +251,8 @@
         };
         
         var EEZ = L.geoJSON(eez.responseJSON, {
-        style: areaStyle,
-        onEachFeature: function( feature, layer ){
+         style: areaStyle,
+          onEachFeature: function( feature, layer ){
                        layer.bindPopup(
                          "<b>Descrição: </b>" + feature.properties.GEONAME + "<br>" +
                          "<b>Tipo: </b>" + feature.properties.POL_TYPE + "<br>" +
@@ -229,38 +263,59 @@
         }
         ).addTo(map);
         
-        var FALKLANDS = L.geoJSON(falklands.responseJSON, {
+        var EXTENSAO = L.geoJSON(extensao.responseJSON, {
+          style: {
+            color: 'LightGray',
+            weight: 2,
+            fillOpacity: .25
+          },
+          onEachFeature: function( feature, layer ){
+                         layer.bindPopup(
+                           "<b>Nome: </b>" + feature.properties.nome + "<br>" +
+                           "<b>Região: </b>" +  feature.properties.regiao + "<br>" +
+                           "<b>Área (km &#178; ): "
+                           );
+          }
+        }
+        ).addTo(map);
+      
+        var LME = L.geoJSON(lme.responseJSON, {
             style: {
-              color: '#f1f4c7',
+              color: 'Aquamarine',
               weight: 2,
               fillOpacity: .25
             },
             onEachFeature: function( feature, layer ){
                            layer.bindPopup(
-                             "<b>Descrição: </b>" + "Malvinas" + "<br>" +
-                             "<b>Fonte: </b>" + "<a href= http://www.marineregions.org/gazetteer.php?p=details&id=47625 target='_blank'>Link.</a>" + "<br>" +
-                             "<b>Área (km &#178; ): " + "<br>" +
-                             "<b>Obs.: </b>"
+                             "<b>Descrição: </b>" + feature.properties.LME_NAME + "<br>" +
+                             "<b>Área (km &#178; ): " + feature.properties.SUM_GIS_KM.toLocaleString('de-DE', { maximumFractionDigits: 2 }) 
                            );
             }
           }
-        ).addTo(map);
+        );
         
-      var EXTENSAO = L.geoJSON(extensao.responseJSON, {
-        style: {
-          color: 'LightGray',
-          weight: 2,
-          fillOpacity: .25
-        },
-        onEachFeature: function( feature, layer ){
-                       layer.bindPopup(
-                         "<b>Nome: </b>" + feature.properties.nome + "<br>" +
-                         "<b>Região: </b>" +  feature.properties.regiao + "<br>" +
-                         "<b>Área (km &#178; ): "
-                         );
-          }
+        function surface(feature){
+          return feature.properties.SURFACE/1000000
         }
-      ).addTo(map);
+        
+        var FAO = L.geoJSON(fao.responseJSON, {
+            style: {
+              color: 'Chocolate',
+              weight: 2,
+              fillOpacity: .25
+            },
+            onEachFeature: function( feature, layer ){
+                           layer.bindPopup(
+                             "<b>Descrição: </b>" + feature.properties.NAME_ES + "<br>" +
+                             "<b>Área (km &#178; ): " + surface(feature).toLocaleString('de-DE', { maximumFractionDigits: 2 })+  "<br>" +
+                             "<b>Oceano:  </b>" + feature.properties.OCEAN +  "<br>" +
+                             "<b>Área FAO:  </b>" + feature.properties.F_AREA +  "<br>" +
+                             "<b>Sub-área FAO:  </b>" + feature.properties.F_SUBAREA +  "<br>" +
+                             "<b>Divisão FAO: </b>" + feature.properties.F_DIVISION
+                           );
+            }
+          }
+        );
       
       // Add Minimap
       var miniMap = new L.Control.MiniMap(OpenStreetMap_Mapnik, {
@@ -270,8 +325,8 @@
       ).addTo(map);
         
       var basemaps = [
-              Esri_OceanBasemap, Esri_NatGeoWorldMap, Esri_WorldImagery, OpenStreetMap_Mapnik , 
-              OpenTopoMap, wmsLayer
+              Esri_OceanBasemap, Esri_NatGeoWorldMap, Esri_WorldImagery, 
+              OpenStreetMap_Mapnik , OpenTopoMap
               ]
             
       map.addControl(L.control.basemaps({
@@ -291,6 +346,11 @@
           "Zona Econômica Exclusiva (200MN)": EEZ,
           "Extensão da PC": EXTENSAO
         },
+        "Limites Ambientais":{
+          "Ecoregions": Ecoregions,
+          "Large Marine Ecosystems": LME,
+          "FAO": FAO
+        }
         //"Ambiental": {
         //  "Unidades de Conservação": UC
         //},
