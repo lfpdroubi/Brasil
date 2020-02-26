@@ -1,117 +1,76 @@
-<!DOCTYPE html>
-<html>
 
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    
-    <title>Cadastro Marinho para a América Latina</title>
-    
-    <!-- Add css -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
-        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-        crossorigin=""/>
-    <link rel="stylesheet" href="lib/leaflet-search/dist/leaflet-search.src.css" />
-    <link rel="stylesheet" href="lib/Leaflet.MousePosition/src/L.Control.MousePosition.css" />
-    <link rel="stylesheet" href="lib/leaflet-groupedlayercontrol/src/leaflet.groupedlayercontrol.css" />
-    <link rel="stylesheet" href="lib/leaflet-mapkey-icon/dist/MapkeyIcons.css" />
-    <link rel="stylesheet" href="lib/leaflet.fullscreen/Control.FullScreen.css" />
-    <link rel="stylesheet" href="lib/leaflet-minimap/dist/Control.MiniMap.min.css" />
-    <link rel="stylesheet" href="lib/leaflet-basemaps/L.Control.Basemaps.css" />
-    <link rel="stylesheet" href="lib/leaflet-betterscale/L.Control.BetterScale.css" />
-
-    <!-- Add jQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <!-- Add Leaflet -->
-    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
-      integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
-      crossorigin=""></script>
-    <!-- Add Leaflet Plugins -->
-    <script src="lib/leaflet-search/dist/leaflet-search.src.js"></script>
-    <script src="lib/Leaflet.MousePosition/src/L.Control.MousePosition.js"></script>
-    <script src="lib/leaflet-groupedlayercontrol/src/leaflet.groupedlayercontrol.js"></script>
-    <script src="lib/leaflet-mapkey-icon/dist/L.Icon.Mapkey.js"></script>
-    <script src='lib/leaflet-easyprint/dist/bundle.js'></script>
-    <script src="lib/leaflet.fullscreen/Control.FullScreen.js"></script>
-    <script src="lib/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
-    <script src="lib/leaflet-basemaps/L.Control.Basemaps.js"></script>
-    <script src="lib/leaflet-betterscale/L.Control.BetterScale.js"></script>
-    <script src="https://leaflet.github.io/Leaflet.Graticule/Leaflet.Graticule.js"></script>
-    <script src="lib/proj4/dist/proj4.js"></script>
-    <script src="lib/proj4leaflet/src/proj4leaflet.js"></script>
-    <script src="lib/leaflet-textpath/leaflet.textpath.js"></script>
-
-    <style type="text/css">
-     #map {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-     }
-    </style>
-
-  </head>
-
-<body>
-    <div id="map"></div>
-    <!-- MAP SCRIPT -->
-    <script>
-    
       // Add AJAX requests for data
       var latinamerica = $.ajax({
         url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/LatinAmerica.geojson",
         dataType: "json",
         success: console.log("Latin America boundaries data successfully loaded."),
         error: function (xhr) {
-          alert(xhr.statusText)
+          alert(xhr.statusText);
         }
-      })
+      });
       
       var falklands = $.ajax({
         url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/malvinas.geojson",
         dataType: "json",
         success: console.log("Falklands data successfully loaded."),
         error: function (xhr) {
-          alert(xhr.statusText)
+          alert(xhr.statusText);
         }
-      }) 
+      });
       
       var eez = $.ajax({
         url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/EEZ.geojson",
         dataType: "json",
         success: console.log("Latin America EEZ data successfully loaded."),
         error: function (xhr) {
-          alert(xhr.statusText)
+          alert(xhr.statusText);
         }
-      })  
+      });  
       
       var extensao = $.ajax({
         url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/extensao_PC/BRA_extensao_pc.geojson",
         dataType: "json",
         success: console.log("CP Extension data successfully loaded."),
         error: function (xhr) {
-          alert(xhr.statusText)
+          alert(xhr.statusText);
         }
-      })
+      });
       
       var lme = $.ajax({
         url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/LME66.geojson",
         dataType: "json",
         success: console.log("LME data successfully loaded."),
         error: function (xhr) {
-          alert(xhr.statusText)
+          alert(xhr.statusText);
         }
-      })     
+      });     
       
       var fao = $.ajax({
         url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/FAO_Area.geojson",
         dataType: "json",
         success: console.log("FAO data successfully loaded."),
         error: function (xhr) {
-          alert(xhr.statusText)
+          alert(xhr.statusText);
         }
-      })
+      });
+      
+      var presal = $.ajax({
+        url:"https://raw.githubusercontent.com/Cadastro-Marinho/BrasilData/master/ANP/presal.geojson",
+        dataType: "json",
+        success: console.log("PRÉ-SAL data successfully loaded."),
+        error: function (xhr) {
+          alert(xhr.statusText);
+        }
+      });
+      
+      var blocos_petroleo = $.ajax({
+        url:"https://raw.githubusercontent.com/Cadastro-Marinho/BrasilData/master/ANP/blocos_exploratorios.geojson",
+        dataType: "json",
+        success: console.log("BLOCOS_EXPLORATÓRIOS data successfully loaded."),
+        error: function (xhr) {
+          alert(xhr.statusText);
+        }
+      });
 
       
       /* when().done() SECTION*/
@@ -181,7 +140,7 @@
           'http://geo.vliz.be/geoserver/Ecoregions/wms', {
             layers: 'ecoregions',
             transparency: true,
-            opacity: .40
+            opacity: 0.40
         });
         
         // Adds Bathymetry data
@@ -197,10 +156,10 @@
         var LatinAmerica = L.geoJSON(latinamerica.responseJSON, {
           style: function(feature) {
             return{
-              fillOpacity: .25,
+              fillOpacity: 0.25,
               color: '#f1f4c7',
               weight: 0.75
-            }
+            };
           },
           onEachFeature: function( feature, layer ){
             layer.bindPopup(
@@ -219,13 +178,13 @@
             style: {
               color: '#f1f4c7',
               weight: 2,
-              fillOpacity: .25
+              fillOpacity: 0.25
             },
             onEachFeature: function( feature, layer ){
                            layer.bindPopup(
                              "<b>Descrição: </b>" + "Malvinas" + "<br>" +
                              "<b>Fonte: </b>" + "<a href= http://www.marineregions.org/gazetteer.php?p=details&id=47625 target='_blank'>Link.</a>" + "<br>" +
-                             "<b>Área (km &#178; ): " + "<br>" +
+                             "<b>Área (km &#178; ): </b>" + "<br>" +
                              "<b>Obs.: </b>"
                            );
             }
@@ -237,14 +196,14 @@
         }
         
         function getAreaColor(feature){
-          console.log(feature)
+          console.log(feature);
           	switch (feature.properties.POL_TYPE){
             	case '200NM' : return '#133863';
             	case 'Joint regime': return 'Gold';
               case 'Overlapping claim' : return 'Red';
               	break;
             }
-        };
+        }
         
         function areaStyle(feature){
         	return {
@@ -254,8 +213,8 @@
             color: 'white',
             dashArray: '3',
             fillOpacity: 0.40
-          }
-        };
+          };
+        }
         
         var EEZ = L.geoJSON(eez.responseJSON, {
          style: areaStyle,
@@ -264,7 +223,7 @@
                          "<b>Descrição: </b>" + feature.properties.GEONAME + "<br>" +
                          "<b>Tipo: </b>" + feature.properties.POL_TYPE + "<br>" +
                          "<b>Fonte: </b>" + link(feature) + "<br>" +
-                         "<b>Área (km &#178; ): " + feature.properties.AREA_KM2.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + "<br>" 
+                         "<b>Área (km &#178; ): </b>" + feature.properties.AREA_KM2.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + "<br>" 
                          );
           }
         }
@@ -274,13 +233,13 @@
           style: {
             color: 'LightGray',
             weight: 2,
-            fillOpacity: .25
+            fillOpacity: 0.25
           },
           onEachFeature: function( feature, layer ){
                          layer.bindPopup(
                            "<b>Nome: </b>" + feature.properties.nome + "<br>" +
                            "<b>Região: </b>" +  feature.properties.regiao + "<br>" +
-                           "<b>Área (km &#178; ): "
+                           "<b>Área (km &#178; ): </b>"
                            );
           }
         }
@@ -290,35 +249,99 @@
             style: {
               color: 'Aquamarine',
               weight: 2,
-              fillOpacity: .25
+              fillOpacity: 0.25
             },
             onEachFeature: function( feature, layer ){
                            layer.bindPopup(
                              "<b>Descrição: </b>" + feature.properties.LME_NAME + "<br>" +
-                             "<b>Área (km &#178; ): " + feature.properties.SUM_GIS_KM.toLocaleString('de-DE', { maximumFractionDigits: 2 }) 
+                             "<b>Área (km &#178; ): </b>" + feature.properties.SUM_GIS_KM.toLocaleString('de-DE', { maximumFractionDigits: 2 }) 
                            );
             }
           }
         );
         
         function surface(feature){
-          return feature.properties.SURFACE/1000000
+          return feature.properties.SURFACE/1000000;
         }
         
         var FAO = L.geoJSON(fao.responseJSON, {
             style: {
               color: 'Chocolate',
               weight: 2,
-              fillOpacity: .25
+              fillOpacity: 0.25
             },
             onEachFeature: function( feature, layer ){
                            layer.bindPopup(
                              "<b>Descrição: </b>" + feature.properties.NAME_ES + "<br>" +
-                             "<b>Área (km &#178; ): " + surface(feature).toLocaleString('de-DE', { maximumFractionDigits: 2 })+  "<br>" +
+                             "<b>Área (km &#178; ): </b>" + surface(feature).toLocaleString('de-DE', { maximumFractionDigits: 2 })+  "<br>" +
                              "<b>Oceano:  </b>" + feature.properties.OCEAN +  "<br>" +
                              "<b>Área FAO:  </b>" + feature.properties.F_AREA +  "<br>" +
                              "<b>Sub-área FAO:  </b>" + feature.properties.F_SUBAREA +  "<br>" +
                              "<b>Divisão FAO: </b>" + feature.properties.F_DIVISION
+                           );
+            }
+          }
+        );
+        
+        var PRESAL = L.geoJSON(presal.responseJSON, {
+            style: {
+              color: 'DarkSeaGreen',
+              weight: 2,
+              fillOpacity: 0.25
+            },
+            onEachFeature: function( feature, layer ){
+                           layer.bindPopup(
+                             "<b>Descrição: </b>" + feature.properties.NOME
+                           );
+            }
+          }
+        );
+        
+        function getBlocoColor(feature){
+          console.log(feature);
+          	switch (feature.properties.RODADA){
+            	case 'Rodada 3' : return 'Orange';
+            	case 'Rodada 6': return 'LightPink'
+              case 'Rodada 7' : return 'LightGreen';
+              case 'Rodada 9' : return 'Salmon';
+              case 'Rodada 10': return 'LightSeaGreen';
+              case 'Rodada 11': return 'OliveDrab';
+              case 'Rodada 12': return 'DarkSlateBlue';
+              case 'Rodada 13': return 'DarkOrange';
+              case 'Rodada 14': return 'Orchid';
+              case 'Rodada 15': return 'DarkSeaGreen';
+              case 'Partilha 1': return 'Gainsboro';
+              case 'Partilha 2': return 'Violet';
+              case 'Partilha 3': return 'Pink';
+              case 'Partilha 4': return 'Purple';
+              case 'Partilha 5': return 'Aquamarine'
+              	break;
+            }
+        }
+        
+        function blocoStyle(feature){
+        	return {
+          	fillColor: getBlocoColor(feature),
+            weight: 1,
+            opacity: 1,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.40
+          };
+        }
+        
+        var BLOCOS_PETROLEO = L.geoJSON(blocos_petroleo.responseJSON, {
+            style: blocoStyle,
+            onEachFeature: function( feature, layer ){
+                           layer.bindPopup(
+                             "<b>Bloco: </b>" + feature.properties.NOM_BLOCO + "<br>" +
+                             "<b>Bacia:  </b>" + feature.properties.NOM_BACIA +  "<br>" +
+                             "<b>Área (km &#178; ): </b>" + feature.properties.AREA_TOTAL.toLocaleString('de-DE', { maximumFractionDigits: 2 })+  "<br>" +
+                             "<b>Operador:  </b>" + feature.properties.OPERADOR_C +  "<br>" +
+                             "<b>Rodada:  </b>" + feature.properties.RODADA +  "<br>" +
+                             "<b>Data da Assinatura: </b>" + feature.properties.DAT_ASSINA +  "<br>" +
+                             "<b>Número do contrato: </b>" + feature.properties.NUM_CONTRA +  "<br>" +
+                             "<b>Número da descoberta: </b>" + feature.properties.NUM_DESCOB
                            );
             }
           }
@@ -334,7 +357,7 @@
       var basemaps = [
               Esri_OceanBasemap, Esri_NatGeoWorldMap, Esri_WorldImagery, 
               OpenStreetMap_Mapnik , OpenTopoMap
-              ]
+              ];
             
       map.addControl(L.control.basemaps({
         basemaps: basemaps,
@@ -360,6 +383,10 @@
         },
         "Batimetria": {
           "GEBCO (2019)": GEBCO
+        },
+        "Petróleo e Gás": {
+          "Pré-Sal": PRESAL,
+          "Blocos de Exploração": BLOCOS_PETROLEO
         }
         //"Ambiental": {
         //  "Unidades de Conservação": UC
@@ -400,11 +427,8 @@
 			     {start: 4, end: 4, interval: 10},
 			     {start: 5, end: 7, interval: 5},
 			     {start: 8, end: 10, interval: 1},
-			     {start: 11, end:15, interval:.2}
+			     {start: 11, end:15, interval: 0.2}
 			   ]
 		  }).addTo(map);        
 
       });
-    </script>
-</body>
-</html>
